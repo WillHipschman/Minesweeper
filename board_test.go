@@ -4,6 +4,88 @@ import "testing"
 import "fmt"
 import "github.com/willhipschman/minesweeper/resources"
 
+
+///
+/// Some tests contain comments indicating board positions to help reason about tests.
+/// * indicates a bomb.
+/// . indicates an unexplored cell.
+/// X indicates an explored cell with no adjacent bombs.
+/// {1-8} indicates the number of adjacent bombs.
+///
+
+func TestE2E(t *testing.T){
+    board := new(Board)
+    
+    // **..
+    // ....
+    // ....
+    // ..*.
+    testCountOfBombs(t, board, 4, 4)
+    board.privateField[0][0] = BOMB
+    board.privateField[0][1] = BOMB
+    board.privateField[3][2] = BOMB
+    board.numOfBombs = 3
+    
+    
+    board.explore(1, 3)
+    
+    // **1X
+    // ..1X
+    // ..11
+    // ..*.
+    
+    // discovered
+    assertIsEqual(t, int(board.displayField[0][3]), -1, "Position 0,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[0][2]), 1, "Position 0,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[1][3]), -1, "Position 1,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[1][2]), 1, "Position 1,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[2][3]), 1, "Position 2,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[2][2]), 1, "Position 2,2 should contain %d but contained %d")
+
+    // undiscovered
+    assertIsEqual(t, int(board.displayField[0][1]), 0, "Position 0,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[1][1]), 0, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[2][1]), 0, "Position 2,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][1]), 0, "Position 3,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][2]), 0, "Position 3,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][3]), 0, "Position 3,3 should contain %d but contained %d")
+    
+    board.explore(2, 0)
+    
+    // **1X
+    // 221X
+    // X111
+    // X1*.
+    
+    // discovered
+    assertIsEqual(t, int(board.displayField[1][0]), 2, "Position 1,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[1][1]), 2, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[2][0]), -1, "Position 2,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[2][1]), 1, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][0]), -1, "Position 2,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][1]), 1, "Position 3,1 should contain %d but contained %d")
+    
+    // undiscovered
+    assertIsEqual(t, int(board.displayField[0][0]), 0, "Position 0,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[0][1]), 0, "Position 0,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][2]), 0, "Position 3,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[3][3]), 0, "Position 3,3 should contain %d but contained %d")
+    
+    // sanity--make sure nothing else changed
+    assertIsEqual(t, int(board.displayField[1][3]), -1, "Position 1,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.displayField[0][2]), 1, "Position 0,2 should contain %d but contained %d")
+    
+    board.explore(3, 3)
+    
+    // **1X
+    // 221X
+    // X111
+    // X1*1
+    
+    assertIsEqual(t, int(board.displayField[3][3]), 1, "Position 3,3 should contain %d but contained %d")
+    assertIsTrue(t, board.IsSolved(), "Board should be solved")
+}
+
 func TestCountOfBombs(t *testing.T){
     board := new(Board)
     

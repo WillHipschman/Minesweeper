@@ -27,55 +27,41 @@ type Board struct{
     colToExplore    int
 }
 
-
-func (board *Board) Explore() error {
+func (board *Board) Explore() (bool, error) {
+    return board.explore(board.rowToExplore, board.colToExplore)
+}
     
-    if board.privateField[board.rowToExplore][board.colToExplore] == BOMB {
-        return errors.New(YOU_LOSE)
+func (board *Board) explore(row, col int) (bool, error) {
+    
+    if board.privateField[row][col] == BOMB {
+        return false, errors.New(YOU_LOSE)
     }
     
-    if (board.privateField[board.rowToExplore][board.colToExplore] == EXPLORED){
-       // We will let users explore cells they have already explored.
-       // It will not change the game board.
-        return nil
+    if (board.privateField[row][col] == EXPLORED){
+        return false, nil
     }
     
-    count := board.countOfBombs(board.rowToExplore, board.colToExplore)
+    count := board.countOfBombs(row, col)
     
     if count == 0 {
-        //recurse
+        board.privateField[row][col] = EXPLORED
+        board.displayField[row][col] = -1
+        
+        // If there are no bombs then we have to explore the neighbors
+        board.exploreNeighbors(row, col)
+        
     } else {
-        board.privateField[board.rowToExplore][board.colToExplore] = EXPLORED
-        board.displayField[board.rowToExplore][board.colToExplore] = rune(count)
+        board.privateField[row][col] = EXPLORED
+        board.displayField[row][col] = rune(count)
     }
     
     board.exploredCells++
     
-    return nil
+    return true, nil
 }
 
 func (board *Board) IsSolved() bool {
     return (board.exploredCells + board.numOfBombs) == (board.height * board.width)
-}
-
-func (board *Board) print(){
-    fmt.Println()
-    
-    for i := range board.privateField {
-        for j := range board.privateField[i] {
-            fmt.Printf("%c", board.privateField[i][j])
-        }
-        fmt.Println()
-    }
-    
-        fmt.Println()
-    
-    for i := range board.privateField {
-        for range board.privateField[i] {
-            fmt.Printf("X")
-        }
-        fmt.Println()
-    }
 }
 
 func (board *Board) Print(){
@@ -208,9 +194,33 @@ func (board *Board) validateHeightAndWidthAreSet() error{
     return nil
 }
 
+func (board *Board) exploreNeighbors(row, col int) {    
+    for i := -1; i <= 1; i++ {
+        for j := -1; j <= 1; j++ {
+            if (i == 0 && j == 0){
+                continue;
+            }
+            
+            if (row + i < 0 || row + i >= board.height) {
+                continue  
+            }
+            
+            if (col + j < 0 || col + j >= board.width) {
+                continue;
+            }
+            
+            if (board.privateField[row + i][col + j] == '*') {
+                panic("Internal Error: Found unexepected bomb.")
+            }
+            
+            board.explore(row + i, col + j)
+        }
+    }
+}
+
 func (board *Board) countOfBombs(row, col int) int{
-    countOfBombs := 0
-        
+    countOfBombs := 0 
+    
     for i := -1; i <= 1; i++ {
         for j := -1; j <= 1; j++ {
             if (i == 0 && j == 0){
