@@ -4,6 +4,78 @@ import "testing"
 import "fmt"
 import "github.com/willhipschman/minesweeper/resources"
 
+func TestCountOfBombs(t *testing.T){
+    board := new(Board)
+    
+    // *.
+    // ..
+    // ..
+    testCountOfBombs(t, board, 3, 2)
+    board.privateField[0][0] = BOMB
+    assertIsEqual(t, board.countOfBombs(0,1), 1, "3*2: There should be %d bomb but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,0), 1, "3*2: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,1), 1, "3*2: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,0), 0, "3*2: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,1), 0, "3*2: There should be %d bombs but there were %d.")
+    
+    // **.
+    // ...
+    testCountOfBombs(t, board, 2, 3)
+    board.privateField[0][0] = BOMB
+    board.privateField[0][1] = BOMB
+    assertIsEqual(t, board.countOfBombs(0,2), 1, "2*3: There should be %d bomb but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,0), 2, "2*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,1), 2, "2*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,2), 1, "2*3: There should be %d bombs but there were %d.")
+    
+    // .*
+    // **
+    testCountOfBombs(t, board, 2, 2)
+    board.privateField[0][1] = BOMB
+    board.privateField[1][0] = BOMB
+    board.privateField[1][1] = BOMB
+    assertIsEqual(t, board.countOfBombs(0,0), 3, "2*2: There should be %d bombs but there were %d.")
+    
+    // ***
+    // *..
+    // ...
+    testCountOfBombs(t, board, 3, 3)
+    board.privateField[0][0] = BOMB
+    board.privateField[0][1] = BOMB
+    board.privateField[0][2] = BOMB
+    board.privateField[1][0] = BOMB
+    assertIsEqual(t, board.countOfBombs(1,1), 4, "3*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(1,2), 2, "3*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,0), 1, "3*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,1), 1, "3*3: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,2), 0, "3*3: There should be %d bombs but there were %d.")
+    
+    // ***..
+    // *.*..
+    // ***..
+    // .....
+    // .....
+    testCountOfBombs(t, board, 4, 5)
+    board.privateField[0][0] = BOMB
+    board.privateField[0][1] = BOMB
+    board.privateField[0][2] = BOMB
+    board.privateField[1][0] = BOMB
+    board.privateField[1][2] = BOMB
+    board.privateField[2][0] = BOMB
+    board.privateField[2][1] = BOMB
+    board.privateField[2][2] = BOMB
+    assertIsEqual(t, board.countOfBombs(1,1), 8, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(0,3), 2, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(0,5), 0, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,3), 2, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(2,5), 0, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(3,0), 2, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(3,1), 3, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(3,2), 2, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(3,3), 1, "5*5: There should be %d bombs but there were %d.")
+    assertIsEqual(t, board.countOfBombs(3,4), 0, "5*5: There should be %d bombs but there were %d.")
+}
+
 func TestSetRowToExplore(t *testing.T){
     board := new(Board)
     board.SetHeight(20)
@@ -203,4 +275,12 @@ func countTypes(t *testing.T, board *Board) (bombs int, nonBombs int){
     }
     
     return bombs, nonBombs
+}
+
+func testCountOfBombs(t *testing.T, board *Board, height, width int){
+    board.SetHeight(height)
+    board.SetWidth(width)
+    if err := board.Setup(); err != nil {
+        t.Errorf(err.Error())
+    }
 }
