@@ -10,7 +10,6 @@ var(
     DIMENSION_TOO_LARGE = "The dimension cannot be greater than 80 for width and 40 for height."
     HEIGHT_WIDTH_NOT_SET = "Height and Width must be set for this operation to complete."
     YOU_LOSE = "Boom! You lose!"
-    EXPLORED = 'E'
     BOMB = '*'
 )
 
@@ -20,8 +19,7 @@ type Board struct{
     width           int
     height          int
     numOfBombs      int
-    privateField    [][]rune
-    displayField    [][]rune
+    field           [][]rune
     exploredCells   int
     rowToExplore    int
     colToExplore    int
@@ -33,26 +31,24 @@ func (board *Board) Explore() (bool, error) {
     
 func (board *Board) explore(row, col int) (bool, error) {
     
-    if board.privateField[row][col] == BOMB {
+    if board.field[row][col] == BOMB {
         return false, errors.New(YOU_LOSE)
     }
     
-    if (board.privateField[row][col] == EXPLORED){
+    if (board.field[row][col] != 0){
         return false, nil
     }
     
     count := board.countOfBombs(row, col)
     
     if count == 0 {
-        board.privateField[row][col] = EXPLORED
-        board.displayField[row][col] = -1
+        board.field[row][col] = -1
         
         // If there are no bombs then we have to explore the neighbors
         board.exploreNeighbors(row, col)
         
     } else {
-        board.privateField[row][col] = EXPLORED
-        board.displayField[row][col] = rune(count)
+        board.field[row][col] = rune(count)
     }
     
     board.exploredCells++
@@ -68,12 +64,12 @@ func (board *Board) Print(){
     fmt.Println()
     fmt.Println("The board is:")
     
-    for i := range board.displayField {
-        for j := range board.displayField[i] {
-            if (board.displayField[i][j] == 0){
+    for i := range board.field {
+        for j := range board.field[i] {
+            if (board.field[i][j] == 0){
                 fmt.Print("X")   
-            }else if (board.displayField[i][j] > 0){
-                fmt.Print(board.displayField[i][j])   
+            }else if (board.field[i][j] > 0 && board.field[i][j] != BOMB){
+                fmt.Print(int(board.field[i][j]))
             } else {
                 fmt.Print(".")   
             }
@@ -165,20 +161,18 @@ func (board *Board) Setup() error {
     // A cell   containing a * is a bomb
     // A cell   containing 0 is undiscovered and may be explored
     // A cell containi  ng 1 is discovered and may not be explored    
-    board.privateField = make([][]rune, board.height)
-    board.displayField = make([][] rune, board.height)
+    board.field = make([][]rune, board.height)
     
-    for i := range board.privateField {
-        board.privateField[i] = make([]rune, board.width)
-        board.displayField[i] = make([]rune, board.width)
+    for i := range board.field {
+        board.field[i] = make([]rune, board.width)
     }
     
     for numberToGenerate := board.numOfBombs; numberToGenerate > 0;{
         row := rand.Intn(board.height)
             col := rand.Intn(board.width)
                 
-        if (board.privateField[row][col] == 0){
-            board.privateField[row][col] = BOMB
+        if (board.field[row][col] == 0){
+            board.field[row][col] = BOMB
             numberToGenerate--
         }
     }
@@ -201,15 +195,11 @@ func (board *Board) exploreNeighbors(row, col int) {
                 continue;
             }
             
-            if (row + i < 0 || row + i >= board.height) {
-                continue  
+            if !board.validatePosition(row + i, col + j){
+                continue
             }
             
-            if (col + j < 0 || col + j >= board.width) {
-                continue;
-            }
-            
-            if (board.privateField[row + i][col + j] == '*') {
+            if (board.field[row + i][col + j] == '*') {
                 panic("Internal Error: Found unexepected bomb.")
             }
             
@@ -227,19 +217,27 @@ func (board *Board) countOfBombs(row, col int) int{
                 continue;
             }
             
-            if (row + i < 0 || row + i >= board.height) {
-                continue;   
+            if !board.validatePosition(row + i, col + j){
+                continue
             }
             
-            if (col + j < 0 || col + j >= board.width) {
-                continue;
-            }
-            
-            if (board.privateField[row + i][col + j] == '*') {
+            if (board.field[row + i][col + j] == '*') {
                 countOfBombs++;
             }
         }
     }
     
     return countOfBombs
+}
+
+func (board *Board) validatePosition(row, col int) bool{
+    if (row < 0 || row >= board.height) {
+        return false;   
+    }
+    
+    if (col < 0 || col >= board.width) {
+        return false
+    }
+    
+    return true
 }

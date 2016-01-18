@@ -33,7 +33,7 @@ func TestMultipleExplore(t *testing.T){
 func TestLosing(t *testing.T){
     board := new(Board)
     testCountOfBombs(t, board, 4, 4)
-    board.privateField[0][0] = BOMB
+    board.field[0][0] = BOMB
     if valid, err := board.explore(0,0); valid || err == nil {
         t.Errorf("Choosing a bomb should have resulted in failure")
     }
@@ -47,9 +47,9 @@ func TestE2E(t *testing.T){
     // ....
     // ..*.
     testCountOfBombs(t, board, 4, 4)
-    board.privateField[0][0] = BOMB
-    board.privateField[0][1] = BOMB
-    board.privateField[3][2] = BOMB
+    board.field[0][0] = BOMB
+    board.field[0][1] = BOMB
+    board.field[3][2] = BOMB
     board.numOfBombs = 3
     
     board.explore(1, 3)
@@ -60,20 +60,20 @@ func TestE2E(t *testing.T){
     // ..*.
     
     // discovered
-    assertIsEqual(t, int(board.displayField[0][3]), -1, "Position 0,3 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[0][2]), 1, "Position 0,2 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[1][3]), -1, "Position 1,3 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[1][2]), 1, "Position 1,2 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[2][3]), 1, "Position 2,3 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[2][2]), 1, "Position 2,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][3]), -1, "Position 0,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][2]), 1, "Position 0,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][3]), -1, "Position 1,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][2]), 1, "Position 1,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[2][3]), 1, "Position 2,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[2][2]), 1, "Position 2,2 should contain %d but contained %d")
 
     // undiscovered
-    assertIsEqual(t, int(board.displayField[0][1]), 0, "Position 0,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[1][1]), 0, "Position 1,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[2][1]), 0, "Position 2,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][1]), 0, "Position 3,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][2]), 0, "Position 3,2 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][3]), 0, "Position 3,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][1]), int(BOMB), "Position 0,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][1]), 0, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[2][1]), 0, "Position 2,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][1]), 0, "Position 3,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][2]), int(BOMB), "Position 3,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][3]), 0, "Position 3,3 should contain %d but contained %d")
     
     board.explore(2, 0)
     
@@ -83,22 +83,22 @@ func TestE2E(t *testing.T){
     // X1*.
     
     // discovered
-    assertIsEqual(t, int(board.displayField[1][0]), 2, "Position 1,0 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[1][1]), 2, "Position 1,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[2][0]), -1, "Position 2,0 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[2][1]), 1, "Position 1,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][0]), -1, "Position 2,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][1]), 1, "Position 3,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][0]), 2, "Position 1,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][1]), 2, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[2][0]), -1, "Position 2,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[2][1]), 1, "Position 1,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][0]), -1, "Position 2,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][1]), 1, "Position 3,1 should contain %d but contained %d")
     
     // undiscovered
-    assertIsEqual(t, int(board.displayField[0][0]), 0, "Position 0,0 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[0][1]), 0, "Position 0,1 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][2]), 0, "Position 3,2 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[3][3]), 0, "Position 3,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][0]), int(BOMB), "Position 0,0 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][1]), int(BOMB), "Position 0,1 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][2]), int(BOMB), "Position 3,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][3]), 0, "Position 3,3 should contain %d but contained %d")
     
     // sanity--make sure nothing else changed
-    assertIsEqual(t, int(board.displayField[1][3]), -1, "Position 1,3 should contain %d but contained %d")
-    assertIsEqual(t, int(board.displayField[0][2]), 1, "Position 0,2 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[1][3]), -1, "Position 1,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[0][2]), 1, "Position 0,2 should contain %d but contained %d")
     
     board.explore(3, 3)
     
@@ -107,7 +107,7 @@ func TestE2E(t *testing.T){
     // X111
     // X1*1
     
-    assertIsEqual(t, int(board.displayField[3][3]), 1, "Position 3,3 should contain %d but contained %d")
+    assertIsEqual(t, int(board.field[3][3]), 1, "Position 3,3 should contain %d but contained %d")
     assertIsTrue(t, board.IsSolved(), "Board should be solved")
 }
 
@@ -118,7 +118,7 @@ func TestCountOfBombs(t *testing.T){
     // ..
     // ..
     testCountOfBombs(t, board, 3, 2)
-    board.privateField[0][0] = BOMB
+    board.field[0][0] = BOMB
     assertIsEqual(t, board.countOfBombs(0,1), 1, "3*2: There should be %d bomb but there were %d.")
     assertIsEqual(t, board.countOfBombs(1,0), 1, "3*2: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(1,1), 1, "3*2: There should be %d bombs but there were %d.")
@@ -128,8 +128,8 @@ func TestCountOfBombs(t *testing.T){
     // **.
     // ...
     testCountOfBombs(t, board, 2, 3)
-    board.privateField[0][0] = BOMB
-    board.privateField[0][1] = BOMB
+    board.field[0][0] = BOMB
+    board.field[0][1] = BOMB
     assertIsEqual(t, board.countOfBombs(0,2), 1, "2*3: There should be %d bomb but there were %d.")
     assertIsEqual(t, board.countOfBombs(1,0), 2, "2*3: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(1,1), 2, "2*3: There should be %d bombs but there were %d.")
@@ -138,19 +138,19 @@ func TestCountOfBombs(t *testing.T){
     // .*
     // **
     testCountOfBombs(t, board, 2, 2)
-    board.privateField[0][1] = BOMB
-    board.privateField[1][0] = BOMB
-    board.privateField[1][1] = BOMB
+    board.field[0][1] = BOMB
+    board.field[1][0] = BOMB
+    board.field[1][1] = BOMB
     assertIsEqual(t, board.countOfBombs(0,0), 3, "2*2: There should be %d bombs but there were %d.")
     
     // ***
     // *..
     // ...
     testCountOfBombs(t, board, 3, 3)
-    board.privateField[0][0] = BOMB
-    board.privateField[0][1] = BOMB
-    board.privateField[0][2] = BOMB
-    board.privateField[1][0] = BOMB
+    board.field[0][0] = BOMB
+    board.field[0][1] = BOMB
+    board.field[0][2] = BOMB
+    board.field[1][0] = BOMB
     assertIsEqual(t, board.countOfBombs(1,1), 4, "3*3: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(1,2), 2, "3*3: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(2,0), 1, "3*3: There should be %d bombs but there were %d.")
@@ -163,14 +163,14 @@ func TestCountOfBombs(t *testing.T){
     // .....
     // .....
     testCountOfBombs(t, board, 4, 5)
-    board.privateField[0][0] = BOMB
-    board.privateField[0][1] = BOMB
-    board.privateField[0][2] = BOMB
-    board.privateField[1][0] = BOMB
-    board.privateField[1][2] = BOMB
-    board.privateField[2][0] = BOMB
-    board.privateField[2][1] = BOMB
-    board.privateField[2][2] = BOMB
+    board.field[0][0] = BOMB
+    board.field[0][1] = BOMB
+    board.field[0][2] = BOMB
+    board.field[1][0] = BOMB
+    board.field[1][2] = BOMB
+    board.field[2][0] = BOMB
+    board.field[2][1] = BOMB
+    board.field[2][2] = BOMB
     assertIsEqual(t, board.countOfBombs(1,1), 8, "5*5: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(0,3), 2, "5*5: There should be %d bombs but there were %d.")
     assertIsEqual(t, board.countOfBombs(0,5), 0, "5*5: There should be %d bombs but there were %d.")
@@ -371,12 +371,12 @@ func failIfNull(t *testing.T, err error, message string){
 func countTypes(t *testing.T, board *Board) (bombs int, nonBombs int){
     for i := 0; i < board.width; i++{
         for j := 0 ; j < board.height; j++{
-            if board.privateField[i][j] == 0{
+            if board.field[i][j] == 0{
                 nonBombs++
-            }else if board.privateField[i][j] == '*'{
+            }else if board.field[i][j] == '*'{
                 bombs++
             }else{
-                t.Errorf(fmt.Sprintf("Unexpected value %d found in field.", board.privateField[i][j]))
+                t.Errorf(fmt.Sprintf("Unexpected value %d found in field.", board.field[i][j]))
             }
         }
     }
