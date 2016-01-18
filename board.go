@@ -4,8 +4,10 @@ import "fmt"
 import "errors"
 
 var(
-    TOO_MANY_BOMBS = "The number of bombs cannot be greater than the number of spaces on the board."
-    INVALID_DIMENSIONS = "The dimension was less than 0."
+    INVALID_BOMBS = "The number of bombs must be greater than 0 and less than width * height."
+    DIMENSION_TOO_SMALL = "The dimension cannot be less than 0."
+    DIMENSION_TOO_LARGE = "The dimension cannot be greater than 80 for width and 40 for height."
+    HEIGHT_WIDTH_NOT_SET = "You can declare the number of bombs until height and width have been set."
 )
 
 type setAction func (val int)(error)
@@ -23,12 +25,16 @@ func (board *Board) Init(){
 }
 
 func (board *Board) SetBombs(numOfBombs int)(error){
-    if(numOfBombs < 0){
-        return errors.New(INVALID_DIMENSIONS)
+    if(numOfBombs <= 0){
+        return errors.New(INVALID_BOMBS)
     }
     
-    if(numOfBombs > board.width * board.height){
-        return errors.New(TOO_MANY_BOMBS)
+    if(board.width == 0  || board.height == 0){
+        return errors.New(HEIGHT_WIDTH_NOT_SET)
+    }
+    
+    if(numOfBombs >= board.width * board.height){
+        return errors.New(INVALID_BOMBS)
     }
     
     board.numOfBombs = numOfBombs
@@ -37,7 +43,11 @@ func (board *Board) SetBombs(numOfBombs int)(error){
 
 func (board *Board) SetHeight(height int)(error){
     if(height <= 0){
-        return errors.New(INVALID_DIMENSIONS)
+        return errors.New(DIMENSION_TOO_SMALL)
+    }
+    
+    if(height > 40){
+        return errors.New(DIMENSION_TOO_LARGE)
     }
     
     board.height = height
@@ -46,7 +56,11 @@ func (board *Board) SetHeight(height int)(error){
 
 func (board *Board) SetWidth(width int)(error){
     if(width <= 0){
-        return errors.New(INVALID_DIMENSIONS)
+        return errors.New(DIMENSION_TOO_SMALL)
+    }
+    
+    if(width > 80){
+        return errors.New(DIMENSION_TOO_LARGE)
     }
     
     board.width = width
