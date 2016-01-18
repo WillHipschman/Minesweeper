@@ -8,6 +8,7 @@ var(
     INVALID_BOMBS = "The number of bombs must be greater than 0 and less than width * height."
     DIMENSION_TOO_SMALL = "The dimension cannot be less than 1."
     DIMENSION_TOO_LARGE = "The dimension cannot be greater than 80 for width and 40 for height."
+    DIMENSION_WRONG = "The dimension must be within the bounds of the game board."
     HEIGHT_WIDTH_NOT_SET = "Height and Width must be set for this operation to complete."
     YOU_LOSE = "Boom! You lose!"
     BOMB = '*'
@@ -60,15 +61,33 @@ func (board *Board) IsSolved() bool {
     return (board.exploredCells + board.numOfBombs) == (board.height * board.width)
 }
 
+func (board *Board) PrintSolvedBoard(){
+    fmt.Println()
+    fmt.Println("The board was:")
+    
+    for i := range board.field {
+        for j := range board.field[i] {
+            if i == board.rowToExplore && j == board.colToExplore{
+                fmt.Print("@")
+            }else if (board.field[i][j] == BOMB){
+                fmt.Print("*")
+            } else {
+                fmt.Print(".")   
+            }
+        }
+        fmt.Println()
+    }
+}
+
 func (board *Board) Print(){
     fmt.Println()
     fmt.Println("The board is:")
     
     for i := range board.field {
         for j := range board.field[i] {
-            if (board.field[i][j] == 0){
+            if (board.field[i][j] == 0 || board.field[i][j] == BOMB){
                 fmt.Print("X")   
-            }else if (board.field[i][j] > 0 && board.field[i][j] != BOMB){
+            }else if (board.field[i][j] > 0){
                 fmt.Print(int(board.field[i][j]))
             } else {
                 fmt.Print(".")   
@@ -125,12 +144,8 @@ func (board *Board) SetColToExplore(col int) error{
     // move from 1 based to 0 base index
     col = col -1
     
-    if col < 0 {
-        return errors.New(DIMENSION_TOO_SMALL)
-    }
-    
-    if col >= board.width {
-        return errors.New(DIMENSION_TOO_LARGE)
+    if col < 0 || col >= board.width{
+        return errors.New(DIMENSION_WRONG)
     }
     
     board.colToExplore = col
@@ -141,12 +156,8 @@ func (board *Board) SetRowToExplore(row int) error{
     // move from 1 based to 0 base index
     row = row -1
     
-    if row < 0 {
-        return errors.New(DIMENSION_TOO_SMALL)
-    }
-    
-    if row >= board.height {
-        return errors.New(DIMENSION_TOO_LARGE)
+    if row < 0 || row >= board.height{
+        return errors.New(DIMENSION_WRONG)
     }
     
     board.rowToExplore = row

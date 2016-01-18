@@ -4,7 +4,6 @@ import "testing"
 import "fmt"
 import "github.com/willhipschman/minesweeper/resources"
 
-
 ///
 /// Some tests contain comments indicating board positions to help reason about tests.
 /// * indicates a bomb.

@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 import "github.com/willhipschman/minesweeper/resources"
+import "os"
 
 func main() {
     printWelcomeMessage()
@@ -12,9 +13,23 @@ func main() {
     for solved := board.IsSolved(); !solved;{
         board.Print()
         promptExplore(board)
-        board.Explore()
+        ok, err := board.Explore()
+        
+        if(err != nil){
+            fmt.Println(err.Error())
+            board.PrintSolvedBoard()
+            os.Exit(0)
+        }
+        
+        if(!ok){
+            fmt.Println("You have already explored that cell. Choose Another.")
+            continue
+        }
+        
         solved = board.IsSolved()
     } 
+    
+    printSuccessMessage()
 }
 
 func printWelcomeMessage(){
