@@ -13,6 +13,32 @@ import "github.com/willhipschman/minesweeper/resources"
 /// {1-8} indicates the number of adjacent bombs.
 ///
 
+func TestMultipleExplore(t *testing.T){
+    board := new(Board)
+    testCountOfBombs(t, board, 4, 4)
+    if valid, err := board.explore(0,0); !valid || err != nil {
+        t.Errorf("Explore failed.")
+    }
+    
+    if valid, err := board.explore(0,0); valid || err != nil {
+        t.Errorf("Explore twice should return false and no error.")
+    }
+    
+    if valid, err := board.explore(0,0); valid || err != nil {
+        t.Errorf("Explore thrice should return false and no error.")
+    }
+}
+
+
+func TestLosing(t *testing.T){
+    board := new(Board)
+    testCountOfBombs(t, board, 4, 4)
+    board.privateField[0][0] = BOMB
+    if valid, err := board.explore(0,0); valid || err == nil {
+        t.Errorf("Choosing a bomb should have resulted in failure")
+    }
+}
+
 func TestE2E(t *testing.T){
     board := new(Board)
     
@@ -25,7 +51,6 @@ func TestE2E(t *testing.T){
     board.privateField[0][1] = BOMB
     board.privateField[3][2] = BOMB
     board.numOfBombs = 3
-    
     
     board.explore(1, 3)
     
